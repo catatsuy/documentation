@@ -2991,6 +2991,84 @@ components:
       required:
       - sample_rate
       type: object
+    LogsFacet:
+      description: Object describing a Datadog Log facet.
+      properties:
+        description:
+          description: a text describing of the new facet.
+          type: string
+        facetType:
+          $ref: '#/components/schemas/LogsFacetType'
+        group:
+          description: name of the group in which the facet belongs to.
+          type: string
+        id:
+          description: Auto-generated ID used to identify the facet.
+          readOnly: true
+          type: string
+        path:
+          description: Name of the tag for tag based facet or path of the attribute
+            for logs-attribute based facet.
+          type: string
+        source:
+          $ref: '#/components/schemas/LogsFacetSource'
+        type:
+          $ref: '#/components/schemas/LogsFacetValuesType'
+      required:
+      - path
+      - source
+      type: object
+    LogsFacetListResponse:
+      description: Object with all Facet configurations for a given organization.
+      properties:
+        facets:
+          description: Array of Log facet configurations.
+          items:
+            $ref: '#/components/schemas/LogsFacet'
+          type: array
+      type: object
+    LogsFacetSource:
+      default: log
+      description: 'A string defining source of the facet.
+
+        "tag" for tag based facet or "log" for logs-attribute based facet.'
+      enum:
+      - tag
+      - log
+      type: string
+      x-enum-varnames:
+      - TAG
+      - LOG
+    LogsFacetType:
+      default: list
+      description: 'A string defining type of the facet.
+
+        "range" for measure facets (values are number), otherwise "list"'
+      enum:
+      - list
+      - range
+      type: string
+      x-enum-varnames:
+      - LIST
+      - RANGE
+    LogsFacetValuesType:
+      default: auto
+      description: 'A string defining type of the facet values.
+
+        If "auto" Datadog will use the most appropriated one.'
+      enum:
+      - auto
+      - string
+      - boolean
+      - double
+      - integer
+      type: string
+      x-enum-varnames:
+      - AUTO
+      - STRING
+      - BOOLEAN
+      - DOUBLE
+      - INTEGER
     LogsFilter:
       description: Filter for logs.
       properties:
@@ -7441,16 +7519,19 @@ components:
           $ref: '#/components/schemas/SyntheticsTestDetailsType'
       type: object
     SyntheticsTestDetailsSubType:
-      description: The sub-type of the Synthetic API test, `http`, `ssl`, or `tcp`.
+      description: The sub-type of the Synthetic API test, `http`, `ssl`, `tcp` or
+        `dns`.
       enum:
       - http
       - ssl
       - tcp
+      - dns
       type: string
       x-enum-varnames:
       - HTTP
       - SSL
       - TCP
+      - DNS
     SyntheticsTestDetailsType:
       description: Type of the Synthetic test, either `api` or `browser`.
       enum:
@@ -13156,6 +13237,126 @@ paths:
       tags:
       - Logs
       x-codegen-request-body-name: body
+  /api/v1/logs/config/facets:
+    get:
+      description: 'The Facet object describes the configuration of a log facet.
+
+        This endpoint returns an array of the `LogFacets` objects of your organization.'
+      operationId: ListLogFacets
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsFacetListResponse'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+      summary: List all facets
+      tags:
+      - Logs Facets
+      x-unstable: '**Note**: This endpoint is in public beta.
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
+    post:
+      description: 'Create a new facet.
+
+        Returns the Facet object passed in the request body when the request is successful.'
+      operationId: CreateLogsFacet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogsFacet'
+        description: Object containing the new `LogsFacet`.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsFacet'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsAPIErrorResponse'
+          description: Invalid Parameter Error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsAPIErrorResponse'
+          description: Too Many Requests
+      summary: Create a facet
+      tags:
+      - Logs Facets
+      x-codegen-request-body-name: body
+      x-unstable: '**Note: This endpoint is in public beta.**
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
+  /api/v1/logs/config/facets/{facet_id}:
+    put:
+      description: "Update a facet as identified by its id.\nReturns the Facet object\
+        \ passed in the request body when the request is successful.\n\nUsing the\
+        \ `PUT` method updates your facet\u2019s configuration by **replacing**\n\
+        your current configuration with the new one sent to your Datadog organization."
+      operationId: UpdateLogsFacet
+      parameters:
+      - description: Id of the log facet.
+        in: path
+        name: facet_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogsFacet'
+        description: Object containing the new `LogsFacet`.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsFacet'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsAPIErrorResponse'
+          description: Invalid Parameter Error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '429':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsAPIErrorResponse'
+          description: Too Many Requests
+      summary: Update a facet
+      tags:
+      - Logs Facets
+      x-codegen-request-body-name: body
+      x-unstable: '**Note: This endpoint is in public beta.**
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
   /api/v1/logs/config/index-order:
     get:
       description: Get the current order of your log indexes. This endpoint takes
@@ -17817,6 +18018,13 @@ tags:
   name: Logs
 - description: '[Check API version 2](/api/v2/logs-archives/).'
   name: Logs Archives
+- description: 'Manage configuration of [log facets](https://docs.datadoghq.com/logs/explorer/facets/).
+
+    You need an API and application key with Admin rights to interact with this endpoint.'
+  externalDocs:
+    description: Find out more at
+    url: https://docs.datadoghq.com/logs/explorer/facets
+  name: Logs Facets
 - description: 'Manage configuration of [log indexes](https://docs.datadoghq.com/logs/indexes/).
 
     You need an API and application key with Admin rights to interact with this endpoint.'

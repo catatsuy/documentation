@@ -2199,6 +2199,22 @@ api_v1:
     url: /api/v1/logs-archives/
     identifier: Logs Archives
     generated: true
+  - name: Logs Facets
+    url: /api/v1/logs-facets/
+    identifier: Logs Facets
+    generated: true
+  - name: List all facets
+    parent: Logs Facets
+    url: '#list-all-facets'
+    generated: true
+  - name: Create a facet
+    parent: Logs Facets
+    url: '#create-a-facet'
+    generated: true
+  - name: Update a facet
+    parent: Logs Facets
+    url: '#update-a-facet'
+    generated: true
   - name: Logs Indexes
     url: /api/v1/logs-indexes/
     identifier: Logs Indexes
