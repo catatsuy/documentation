@@ -2551,6 +2551,10 @@ api_v1:
     parent: Synthetics
     url: '#delete-a-global-variable'
     generated: true
+  - name: Get a global variable
+    parent: Synthetics
+    url: '#get-a-global-variable'
+    generated: true
   - name: Edit a global variable
     parent: Synthetics
     url: '#edit-a-global-variable'

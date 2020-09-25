@@ -7051,7 +7051,8 @@ components:
           description: Determines if the variable is secure.
           type: boolean
         value:
-          description: Value of the global variable.
+          description: Value of the global variable. When reading a global variable,
+            the value will not be present if the variable is secure.
           type: string
       required:
       - value
@@ -7441,16 +7442,19 @@ components:
           $ref: '#/components/schemas/SyntheticsTestDetailsType'
       type: object
     SyntheticsTestDetailsSubType:
-      description: The sub-type of the Synthetic API test, `http`, `ssl`, or `tcp`.
+      description: The sub-type of the Synthetic API test, `http`, `ssl`, `tcp` or
+        `dns`.
       enum:
       - http
       - ssl
       - tcp
+      - dns
       type: string
       x-enum-varnames:
       - HTTP
       - SSL
       - TCP
+      - DNS
     SyntheticsTestDetailsType:
       description: Type of the Synthetic test, either `api` or `browser`.
       enum:
@@ -16046,6 +16050,38 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
           description: Not found
       summary: Delete a global variable
+      tags:
+      - Synthetics
+    get:
+      description: Get the detail configuration of a global variable.
+      operationId: GetGlobalVariable
+      parameters:
+      - description: The ID of the global variable.
+        in: path
+        name: variable_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyntheticsGlobalVariable'
+          description: OK
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Not found
+      summary: Get a global variable
       tags:
       - Synthetics
     put:
